@@ -1,13 +1,13 @@
 import yaml
-from pyspark.sql.functions import col, trim, lower
+from pyspark.sql.functions import col, trim
 
 # 1. Accept the configuration parameter passed from the master orchestrator
 dbutils.widgets.text("pipeline_config", "songs_pipeline")
 pipeline_name = dbutils.widgets.get("pipeline_config")
 
 # 2. Dynamically load the YAML configuration
-# NOTE: Replace 'your_username_or_folder' with your actual Databricks folder/email path
-config_path = f"Workspace/Users/kateshipra5@gmail.com/config/{pipeline_name}.yaml"
+config_path = f"/Workspace/Users/kateshipra5@gmail.com/Songs_pipeline/databricks-data-engineering-projects/configs/{pipeline_name}.yaml"
+
 with open(config_path, "r") as f:
     cfg = yaml.safe_load(f)
 
@@ -16,13 +16,21 @@ print(f"🧹 Starting Silver cleansing for table: {cfg['bronze_table']}")
 # 3. Read raw data directly from the Bronze Delta Table
 df_bronze = spark.read.table(cfg["bronze_table"])
 
-# 4. Data Cleansing Transformations
-# Deduplicate records using the primary key defined in the YAML file
-pk = cfg["primary_key"]
-df_cleaned = df_bronze.dropDuplicates([pk])
+# --- NEW STEP: Rename the raw indexed columns to real names ---
+df_renamed = df_bronze \
+    .withColumnRenamed("_c0", "artist_id") \
+    .withColumnRenamed("_c4", "artist_name") \
+    .withColumnRenamed("_c9", "duration") \
+    .withColumnRenamed("_c11", "song_id") \
+    .withColumnRenamed("_c16", "title") \
+    .withColumnRenamed("_c13", "tempo") \
+    .withColumnRenamed("_c14", "year")
 
-# Standardize text columns (e.g., trim spaces and lowercase titles for uniform querying)
-# Checking if specific expected columns exist in this use case
+# 4. Data Cleansing Transformations using the newly assigned names
+pk = cfg["primary_key"]  # This will successfully find "song_id" now!
+df_cleaned = df_renamed.dropDuplicates([pk])
+
+# Standardize text columns using the corrected names
 if "artist_name" in df_cleaned.columns:
     df_cleaned = df_cleaned.withColumn("artist_name", trim(col("artist_name")))
 if "title" in df_cleaned.columns:

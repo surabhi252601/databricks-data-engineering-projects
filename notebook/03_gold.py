@@ -7,7 +7,9 @@ dbutils.widgets.text("pipeline_config", "songs_pipeline")
 pipeline_name = dbutils.widgets.get("pipeline_config")
 
 # 2. Dynamically load the YAML configuration
-config_path = f"/Workspace/Users/kateshipra5@gmail.com/config/{pipeline_name}.yaml"
+config_path = f"/Workspace/Users/kateshipra5@gmail.com/Songs_pipeline/databricks-data-engineering-projects/configs/{pipeline_name}.yaml"
+
+
 with open(config_path, "r") as f:
     cfg = yaml.safe_load(f)
 
