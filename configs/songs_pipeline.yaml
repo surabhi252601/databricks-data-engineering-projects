@@ -1,0 +1,12 @@
+# Metadata configuration for the songs processing workflow
+use_case: "songs_pipeline"
+primary_key: "song_id"
+
+# Ingestion Source Details
+source_path: "/databricks-datasets/songs/data-001/"
+source_format: "csv"
+
+# Target Medallion Layer Tables (Updated to use standard metastore tables)
+bronze_table: "hive_metastore.default.songs_raw_v3"
+silver_table: "hive_metastore.default.songs_prepared_v3"
+gold_table: "hive_metastore.default.top_artists_by_year_v3"
