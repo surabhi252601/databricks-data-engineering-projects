@@ -1,0 +1,12 @@
+# Metadata configuration for the songs processing workflow
+use_case: "songs_pipeline"
+primary_key: "song_id"
+
+# Ingestion Source Details
+source_path: "/databricks-datasets/songs/data-001/"
+source_format: "csv"
+
+# Target Medallion Layer Tables
+bronze_table: "LIVE.songs_raw_v3"
+silver_table: "LIVE.songs_prepared_v3"
+gold_table: "LIVE.top_artists_by_year_v3"
