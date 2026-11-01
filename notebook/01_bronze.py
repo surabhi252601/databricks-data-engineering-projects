@@ -7,14 +7,27 @@ pipeline_name = dbutils.widgets.get("pipeline_config")
 
 # 2. Read the matching YAML config file
 # Double-check that your base path matches your exact Git folder path in your Databricks workspace
-config_path = f"/Workspace/home/your_username_or_folder/config/{pipeline_name}.yaml"
+config_path = f"/Workspace/Users/kateshipra5@gmail.com/Songs_pipeline/databricks-data-engineering-projects/configs/{pipeline_name}.yaml"
+
+
 with open(config_path, "r") as f:
     cfg = yaml.safe_load(f)
 
 print(f"📥 Loading Raw Data from: {cfg['source_path']}")
 
+# # 3. Read raw data dynamically using config parameters
+# df_raw = spark.read.format(cfg["source_format"]).option("header", "true").option("inferSchema", "true").load(cfg["source_path"])
+
 # 3. Read raw data dynamically using config parameters
-df_raw = spark.read.format(cfg["source_format"]).option("header", "true").option("inferSchema", "true").load(cfg["source_path"])
+# UPDATED: Added delimiter="\t" and changed header to "false" to parse the songs dataset properly
+df_raw = (
+    spark.read.format(cfg["source_format"])
+    .option("header", "false")
+    .option("delimiter", "\t")
+    .option("inferSchema", "true")
+    .load(cfg["source_path"])
+)
+
 
 # 4. Add ingestion metadata (Audit column)
 df_bronze = df_raw.withColumn("ingested_at", current_timestamp())
