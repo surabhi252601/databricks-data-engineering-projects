@@ -34,4 +34,5 @@ df_bronze = df_raw.withColumn("ingested_at", current_timestamp())
 
 # 5. Write out directly to Delta format in the Bronze Table
 df_bronze.write.format("delta").mode("overwrite").saveAsTable(cfg["bronze_table"])
+
 print(f"🔹 Successfully written raw data into table: {cfg['bronze_table']}")

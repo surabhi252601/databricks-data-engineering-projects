@@ -1,12 +1,63 @@
-# Metadata configuration for the songs processing workflow
+# Pipeline metadata
 use_case: "songs_pipeline"
 primary_key: "song_id"
 
-# Ingestion Source Details
-source_path: "/databricks-datasets/songs/data-001/"
+# Source configuration
+source_path: "/databricks-datasets/songs/data-001/part-*"
 source_format: "csv"
 
-# Target Medallion Layer Tables (Updated to use standard metastore tables)
+# Source reader options
+reader_options:
+  header: "false"
+  delimiter: "\t"
+
+# Explicit source schema
+schema:
+  - name: artist_id
+    type: string
+  - name: artist_latitude
+    type: double
+  - name: artist_longitude
+    type: double
+  - name: artist_location
+    type: string
+  - name: artist_name
+    type: string
+  - name: duration
+    type: double
+  - name: end_of_fade_in
+    type: double
+  - name: key
+    type: int
+  - name: key_confidence
+    type: double
+  - name: loudness
+    type: double
+  - name: release
+    type: string
+  - name: song_hotnes
+    type: double
+  - name: song_id
+    type: string
+  - name: start_of_fade_out
+    type: double
+  - name: tempo
+    type: double
+  - name: time_signature
+    type: double
+  - name: time_signature_confidence
+    type: double
+  - name: title
+    type: string
+  - name: year
+    type: double
+  - name: partial_sequence
+    type: int
+
+# Bronze configuration
+bronze_write_mode: "overwrite"
+
+# Target tables
 bronze_table: "workspace.default.songs_raw_table"
 silver_table: "workspace.default.songs_prepared_table"
 gold_table: "workspace.default.top_artists_by_year_table"
